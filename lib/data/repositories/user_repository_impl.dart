@@ -2,6 +2,7 @@ import 'package:sqlite/data/models/user_model.dart';
 import 'package:sqlite/domain/entities/user_entity.dart';
 import 'package:sqlite/domain/repository/user_repository.dart';
 import 'package:sqlite/helper/database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class UserRepositoryImpl extends UserRepository {
   final DatabaseHelper dbHelper;
@@ -21,8 +22,14 @@ class UserRepositoryImpl extends UserRepository {
       id: user.id,
       name: user.name,
       email: user.email,
+      noTelpon: user.noTelpon,
+      alamat: user.alamat,
     );
-    await db.insert('users', userModel.toMap());
+    await db.insert(
+      'users', 
+      userModel.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   @override
@@ -32,6 +39,8 @@ class UserRepositoryImpl extends UserRepository {
       id: user.id,
       name: user.name,
       email: user.email,
+      noTelpon: user.noTelpon,
+      alamat: user.alamat,
     );
 
     await db.update(
@@ -39,6 +48,7 @@ class UserRepositoryImpl extends UserRepository {
       userModel.toMap(),
       where: 'id = ?',
       whereArgs: [user.id],
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 

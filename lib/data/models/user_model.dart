@@ -1,10 +1,10 @@
 import 'package:sqlite/domain/entities/user_entity.dart';
 
 class UserModel extends UserEntity {
-  UserModel({required super.id, required super.name, required super.email});
+  UserModel({required super.id, required super.name, required super.email, required super.noTelpon, required super.alamat});
 
   Map<String, dynamic> toMap() {
-    return {'id': id, 'name': name, 'email': email};
+    return {'id': id, 'name': name, 'email': email, 'noTelpon': noTelpon, 'alamat': alamat};
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -12,6 +12,8 @@ class UserModel extends UserEntity {
       id: map['id'] ?? '',
       name: map['name'] ?? '',
       email: map['email'] ?? '',
+      noTelpon: map['noTelpon'] ?? '',
+      alamat: map['alamat'] ?? '',
     );
   }
 }

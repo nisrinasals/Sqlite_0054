@@ -16,6 +16,9 @@ class UserFormPage extends StatefulWidget {
 class _UserFormPageState extends State<UserFormPage> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _noTelponController = TextEditingController();
+  final _alamatController = TextEditingController();
+  String? _noTelponError;
 
   @override
   void initState() {
@@ -23,7 +26,28 @@ class _UserFormPageState extends State<UserFormPage> {
     if (widget.user != null) {
       _nameController.text = widget.user!.name;
       _emailController.text = widget.user!.email;
+      _noTelponController.text = widget.user!.noTelpon;
+      _alamatController.text = widget.user!.alamat;
     }
+  }
+
+  String? validateNoTelpon(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Nomor telepon tidak boleh kosong';
+    }
+    if (!value.startsWith('+62')) {
+      return 'Nomor harus dimulai dengan +62';
+    }
+    if (value.length > 15) {
+      return 'Nomor telepon tidak boleh melebihi 15 karakter';
+    }
+    return null;
+  }
+
+  void _validateNoTelpon() {
+    setState(() {
+      _noTelponError = validateNoTelpon(_noTelponController.text);
+    });
   }
 
   @override
@@ -79,21 +103,69 @@ class _UserFormPageState extends State<UserFormPage> {
                 fillColor: Colors.grey[50],
               ),
             ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _noTelponController,
+              keyboardType: TextInputType.phone,
+              onChanged: (_) => _validateNoTelpon(),
+              decoration: InputDecoration(
+                labelText: "No. Telepon",
+                hintText: "+62xxxxxxxxxx",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: const Icon(Icons.phone_outlined),
+                filled: true,
+                fillColor: Colors.grey[50],
+                errorText: _noTelponError,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _alamatController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: "Alamat",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: const Icon(Icons.location_on_outlined),
+                filled: true,
+                fillColor: Colors.grey[50],
+                alignLabelWithHint: true,
+              ),
+            ),
             const SizedBox(height: 32),
             FilledButton.icon(
               onPressed: () {
+                // Validate all fields
                 if (_nameController.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Nama tidak boleh kosong")),
                   );
                   return;
                 }
+                if (validateNoTelpon(_noTelponController.text) != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(validateNoTelpon(_noTelponController.text)!)),
+                  );
+                  return;
+                }
+                if (_alamatController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Alamat tidak boleh kosong")),
+                  );
+                  return;
+                }
+
                 final newUser = UserEntity(
                   id: isEdit
                       ? widget.user!.id
                       : DateTime.now().millisecondsSinceEpoch.toString(),
                   name: _nameController.text,
                   email: _emailController.text,
+                  noTelpon: _noTelponController.text,
+                  alamat: _alamatController.text,
                 );
 
                 if (isEdit) {
@@ -111,7 +183,8 @@ class _UserFormPageState extends State<UserFormPage> {
                 ),
               ),
               icon: const Icon(Icons.save),
-              child: Text(
+              // FIX: Changed 'child' to 'label' below
+              label: Text(
                 isEdit ? "Simpan Perubahan" : "Simpan User Baru",
                 style: const TextStyle(
                   fontSize: 16,

@@ -13,23 +13,41 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         final users = await repository.getAllUsers();
         emit(UserLoaded(users));
       } catch (e) {
-        emit(UserError("Gagal memuat data"));
+        emit(UserError("Gagal memuat data: $e"));
       }
     });
 
     on<AddUserEvent>((event, emit) async {
-      await repository.addUser(event.user);
-      add(LoadUsers());
+      try {
+        await repository.addUser(event.user);
+        emit(UserLoading());
+        final users = await repository.getAllUsers();
+        emit(UserLoaded(users));
+      } catch (e) {
+        emit(UserError("Gagal menambahkan user: $e"));
+      }
     });
 
     on<UpdateUserEvent>((event, emit) async {
-      await repository.updateUser(event.user);
-      add(LoadUsers());
+      try {
+        await repository.updateUser(event.user);
+        emit(UserLoading());
+        final users = await repository.getAllUsers();
+        emit(UserLoaded(users));
+      } catch (e) {
+        emit(UserError("Gagal mengupdate user: $e"));
+      }
     });
 
     on<DeleteUserEvent>((event, emit) async {
-      await repository.deleteUser(event.id);
-      add(LoadUsers());
+      try {
+        await repository.deleteUser(event.id);
+        emit(UserLoading());
+        final users = await repository.getAllUsers();
+        emit(UserLoaded(users));
+      } catch (e) {
+        emit(UserError("Gagal menghapus user"));
+      }
     });
   }
 }

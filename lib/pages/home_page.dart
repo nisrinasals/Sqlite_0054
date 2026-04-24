@@ -16,7 +16,51 @@ class HomePage extends StatelessWidget {
         builder: (context, state) {
           if (state is UserLoading)
             return const Center(child: CircularProgressIndicator());
-          if (state is UserLoaded && state.users.isNotEmpty) {
+          if (state is UserError)
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text(state.message),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.read<UserBloc>().add(LoadUsers()),
+                    child: const Text("Coba Lagi"),
+                  ),
+                ],
+              ),
+            );
+          if (state is UserLoaded) {
+            if (state.users.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.people_outline,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Belum ada user",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Klik + untuk menambah",
+                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              );
+            }
             return ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: state.users.length,
@@ -64,12 +108,62 @@ class HomePage extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    user.email,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.email_outlined,
+                                        size: 14,
+                                        color: Colors.grey[500],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          user.email,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.phone_outlined,
+                                        size: 14,
+                                        color: Colors.grey[500],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        user.noTelpon,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.location_on_outlined,
+                                        size: 14,
+                                        color: Colors.grey[500],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          user.alamat,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -115,6 +209,7 @@ class HomePage extends StatelessWidget {
               },
             );
           }
+          // Fallback for UserInitial or any other state
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
